@@ -1,7 +1,7 @@
 # Use Python 3.11.9 image based on Debian Bullseye in its slim variant as the base image
 FROM python:3.11.9-slim-bullseye
 
-# Some special treatment for psycopg2
+# Some special treatment for psycopg2 
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
     && pip install psycopg2
