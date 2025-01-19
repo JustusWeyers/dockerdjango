@@ -5,6 +5,25 @@ on:
     branches: [ "main" ]
 
 jobs:
+
+  github-secrets:
+    runs-on: self-hosted
+    name: Read a secret
+    steps:
+      - id: read-username
+        shell: bash
+        run: |
+          USERNAME_SECRET=${{ secrets.DOCKERHUB_USERNAME }};
+          echo "username-secret=$USERNAME_SECRET" >> $GITHUB_OUTPUT
+      - id: read-password
+        shell: bash
+        run: |
+          PASSWORD_SECRET=${{ secrets.DOCKERHUB_PASSWORD }};
+          echo "password-secret=$PASSWORD_SECRET" >> $GITHUB_OUTPUT
+    outputs:
+      username: ${{ steps.read-username.outputs.username-secret}}
+      password: ${{ steps.read-password.outputs.password-secret}}
+
   build:
     runs-on: self-hosted
     steps:
@@ -12,8 +31,10 @@ jobs:
         name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ needs.github-secrets.outputs.read-username}}
+          # password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ needs.github-secrets.outputs.read-password}}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
